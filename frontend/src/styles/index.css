@@ -1,1 +1,8 @@
+@import "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { font-family: Inter, ui-sans-serif, system-ui; background-color: #f8faf9; }
 
