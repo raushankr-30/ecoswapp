@@ -1,1 +1,65 @@
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role     String // "user" | "collector" | "recycler" | "admin"
 
+  addresses Address[]
+  wastes    Waste[]   @relation("UserWastes")
+  pickups   Pickup[]  @relation("CollectorPickups")
+  recycles  Pickup[]  @relation("RecyclerPickups")
+  bids      Bid[]     @relation("UserBids")
+}
+
+model Address {
+  id     String  @id @default(uuid())
+  street String
+  city   String
+  state  String
+  zip    String
+  userId String
+  user   User    @relation(fields: [userId], references: [id])
+  wastes Waste[]
+}
+
+model Waste {
+  id        String   @id @default(uuid())
+  ownerId   String
+  owner     User     @relation("UserWastes", fields: [ownerId], references: [id])
+  type      String
+  quantity  Int
+  addressId String?
+  address   Address? @relation(fields: [addressId], references: [id])
+  createdAt DateTime @default(now())
+
+  pickups Pickup[]
+  bids    Bid[]
+}
+
+model Pickup {
+  id      String @id @default(uuid())
+  wasteId String
+  waste   Waste  @relation(fields: [wasteId], references: [id])
+
+  collectorId String?
+  collector   User?   @relation("CollectorPickups", fields: [collectorId], references: [id])
+
+  recyclerId String?
+  recycler   User?   @relation("RecyclerPickups", fields: [recyclerId], references: [id])
+
+  scheduledAt DateTime?
+  status      String    @default("pending")
+}
+
+model Bid {
+  id      String @id @default(uuid())
+  wasteId String
+  waste   Waste  @relation(fields: [wasteId], references: [id])
+
+  bidderId String
+  bidder   User   @relation("UserBids", fields: [bidderId], references: [id])
+
+  price     Float
+  createdAt DateTime @default(now())
+}
